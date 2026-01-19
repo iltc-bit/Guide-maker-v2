@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -6,7 +7,7 @@
   <title>星雲計畫 - 照護指南</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
+    window.tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
@@ -56,58 +57,34 @@
     }
     
     @media print {
-      @page {
-        size: A4;
-        margin: 0;
-      }
-      body {
-        visibility: hidden;
-        background: white;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      #result-card {
-        visibility: visible;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 15mm;
-        border: none !important;
-        box-shadow: none !important;
-      }
-      #result-card * {
-        visibility: visible;
-      }
-      .no-print {
-        display: none !important;
-      }
-      #consult-section {
-        display: none !important;
-      }
+      @page { size: A4; margin: 0; }
+      body { visibility: hidden; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      #result-card { visibility: visible; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 15mm; border: none !important; box-shadow: none !important; }
+      #result-card * { visibility: visible; }
+      .no-print { display: none !important; }
     }
   </style>
   <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@19.0.0",
-    "react/": "https://esm.sh/react@19.0.0/",
     "react-dom": "https://esm.sh/react-dom@19.0.0",
     "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
     "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime",
     "lucide-react": "https://esm.sh/lucide-react@0.460.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai",
     "path": "https://esm.sh/path@^0.12.7",
     "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "url": "https://esm.sh/url@^0.11.4"
   }
 }
 </script>
 </head>
-<body>
+<body class="bg-[#fffafb]">
   <div id="root"></div>
-  <script type="module" src="https://esm.sh/run"></script>
-  <script type="text/babel" data-type="module" src="/index.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
 </body>
 </html>
