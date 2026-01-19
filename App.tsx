@@ -2,21 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Heart, Users, Calendar, ShieldCheck, BookOpen, Activity, ArrowRight, 
-  ChevronDown, CheckCircle2, Lock, MessageSquare, Star, ChevronRight, 
-  Share2, Download, ChevronUp, RefreshCcw, ArrowLeft, Loader2
+  Lock, MessageSquare, Star, Download, RefreshCcw, Loader2
 } from 'lucide-react';
-// Updated import to follow @google/genai guidelines
 import { GoogleGenAI } from "@google/genai";
 
-import { brandColors, cities, currentOptions, futureOptions, questions, powerCategories } from './constants';
+import { currentOptions, questions, powerCategories } from './constants';
 import { AvatarIllustration, IntroIllustration, SceneIllustration, WarmVideoIllustration } from './components/Illustrations';
-import { ConsultForm, MoodState, NebulaData } from './types';
+import { MoodState, NebulaData } from './types';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>('intro'); 
   const [scores, setScores] = useState<Record<number, number>>({});
-  const [expandedPower, setExpandedPower] = useState<string | null>(null); 
-  const [showConsult, setShowConsult] = useState(false);
   const [aiInsight, setAiInsight] = useState<string>('');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [moodState, setMoodState] = useState<MoodState>({ 
@@ -27,16 +23,13 @@ const App: React.FC = () => {
     q1: 5, q8: '', q9: '', q15: '', q16: '', nickname: '', avatar: null
   });
 
-  const [consultForm, setConsultForm] = useState<ConsultForm>({
-    q2: [], q3: '', q4: '', q12: '', q13: '', q14: '', q17: '', q19: '', q20: ''  
-  });
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPage]);
 
   const handleGenerateReport = async () => {
     navigateTo('result');
+    // 可選：發送到 Make.com 進行自動化紀錄
     fetch('https://hook.us2.make.com/osvdwga9wtb365rj4i3v4wxp9lkjpmhy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -47,23 +40,22 @@ const App: React.FC = () => {
   const unlockAiStrategy = async () => {
     setIsAiLoading(true);
     try {
-      // Initialize GoogleGenAI with the mandatory named parameter for apiKey
+      // 確保使用正確的初始化語法
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
       const prompt = `你是一位專業的長期照顧諮詢顧問。
-      使用者暱稱：${nebulaData.nickname}，身份：${nebulaData.q15}。
-      照顧對象患有：${nebulaData.q8}，目前在：${nebulaData.q9}。
+      使用者暱稱：${nebulaData.nickname}。
+      照顧對象患有：${nebulaData.q8}。
       壓力指數：${nebulaData.q1}/10，目前心境：${moodState.currentTag}。
       請針對以上狀況，提供 3 條具體、溫暖且專業的「解鎖行動方案」。請限制在 200 字內，用繁體中文回覆。`;
 
-      // Use ai.models.generateContent directly with model name and contents
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: prompt
       });
-      // Extract text using the response.text property (not a method)
-      setAiInsight(response.text || '');
+      
+      setAiInsight(response.text || '無法生成內容，請稍後再試。');
     } catch (error) {
-      console.error(error);
+      console.error('Gemini API Error:', error);
       setAiInsight('目前 AI 諮詢量較大，請稍後再試，或直接聯絡照顧管家。');
     } finally {
       setIsAiLoading(false);
@@ -82,7 +74,7 @@ const App: React.FC = () => {
   };
 
   const isAssessmentComplete = Object.keys(scores).length === questions.length;
-  const isMoodComplete = moodState.currentImg !== null && moodState.currentTag !== '' && moodState.futureImg !== null && moodState.futureTag !== '';
+  const isMoodComplete = moodState.currentImg !== null && moodState.currentTag !== '';
   const isFinalStepComplete = !!(nebulaData.q8 && nebulaData.nickname && nebulaData.avatar);
 
   const getCategoryScore = (catId: 'support' | 'info' | 'knowledge') => {
@@ -90,9 +82,9 @@ const App: React.FC = () => {
   };
 
   const getRiskLevel = (score: number) => {
-    if (score <= 3) return { label: '高風險', color: '#f87171', bg: '#fee2e2', shadow: 'rgba(248, 113, 113, 0.6)' }; 
-    if (score <= 7) return { label: '中風險', color: '#f59e0b', bg: '#fef3c7', shadow: 'rgba(245, 158, 11, 0.6)' }; 
-    return { label: '低風險', color: '#10b981', bg: '#d1fae5', shadow: 'rgba(16, 185, 129, 0.6)' }; 
+    if (score <= 3) return { label: '高風險', color: '#f87171', bg: '#fee2e2' }; 
+    if (score <= 7) return { label: '中風險', color: '#f59e0b', bg: '#fef3c7' }; 
+    return { label: '低風險', color: '#10b981', bg: '#d1fae5' }; 
   };
 
   const analysis = {
@@ -123,7 +115,7 @@ const App: React.FC = () => {
         )}
 
         {currentPage === 'assessment' && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-in">
             {questions.map((q) => (
               <div key={q.id} className="bg-white p-4 rounded-2xl border-2 border-slate-100 shadow-sm">
                 <div className="flex gap-3 mb-4">
@@ -144,7 +136,7 @@ const App: React.FC = () => {
         )}
 
         {currentPage === 'mood' && (
-          <div className="space-y-8 py-4">
+          <div className="space-y-8 py-4 animate-in">
              <section>
                 <h2 className="text-xl font-black mb-4 flex items-center gap-2"><Heart className="text-pink-500" /> 察覺現況壓力</h2>
                 <div className="grid grid-cols-5 gap-2 mb-4">
@@ -168,7 +160,7 @@ const App: React.FC = () => {
         )}
 
         {currentPage === 'nebula' && (
-          <div className="space-y-6 py-4">
+          <div className="space-y-6 py-4 animate-in">
              <div className="bg-white p-6 rounded-3xl border-2 border-pink-100 shadow-sm space-y-6">
                 <h2 className="text-xl font-black text-center text-pink-600 underline decoration-pink-200">建立照護檔案</h2>
                 <div className="space-y-4">
@@ -197,7 +189,7 @@ const App: React.FC = () => {
         )}
 
         {currentPage === 'result' && (
-          <div className="space-y-8 py-4 animate-in fade-in">
+          <div className="space-y-8 py-4 animate-in">
              <div id="result-card" className="bg-white p-6 rounded-[40px] shadow-2xl border border-pink-50">
                 <div className="text-center mb-8 border-b border-dashed border-pink-200 pb-6">
                    <AvatarIllustration type={nebulaData.avatar} selected={false} />
@@ -257,7 +249,7 @@ const App: React.FC = () => {
 
              <div className="flex gap-2 no-print">
                 <button onClick={() => window.print()} className="flex-1 bg-white border-2 border-slate-100 py-4 rounded-full font-bold flex items-center justify-center gap-2"><Download size={18} /> 保存報告</button>
-                <button onClick={() => setCurrentPage('intro')} className="flex-1 bg-white border-2 border-slate-100 py-4 rounded-full font-bold flex items-center justify-center gap-2"><RefreshCcw size={18} /> 重新檢測</button>
+                <button onClick={handleRestart} className="flex-1 bg-white border-2 border-slate-100 py-4 rounded-full font-bold flex items-center justify-center gap-2"><RefreshCcw size={18} /> 重新檢測</button>
              </div>
           </div>
         )}
